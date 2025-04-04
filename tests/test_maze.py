@@ -1,8 +1,7 @@
-import pytest
 from unittest.mock import MagicMock
 
-from maze import Maze
 from graphics import Window
+from maze import Maze
 
 
 def test_maze_create_cells():
@@ -84,12 +83,6 @@ def test_break_entrance_and_exit():
     mock_win = MagicMock(spec=Window)
     maze = Maze(0, 0, num_rows, num_cols, 10, 10, mock_win)
 
-    # Check initial state
-    assert maze._cells[0][0].has_left_wall is True
-    assert maze._cells[num_rows - 1][num_cols - 1].has_right_wall is True
-
-    maze._break_entrance_and_exit()
-
     # Check that the walls have been removed
     assert maze._cells[0][0].has_left_wall is False
     assert maze._cells[num_rows - 1][num_cols - 1].has_right_wall is False
@@ -109,3 +102,69 @@ def test_break_entrance_and_exit_draw_called():
     maze._draw_cell.assert_any_call(0, 0)
     maze._draw_cell.assert_any_call(num_rows - 1, num_cols - 1)
     assert maze._draw_cell.call_count == 2
+
+
+def test_break_walls_r_all_cells_visited():
+    """Tests that _break_walls_r visits all cells in the maze."""
+    num_rows = 3
+    num_cols = 4
+    maze = Maze(0, 0, num_rows, num_cols, 10, 10)
+    maze._break_walls_r(0, 0)
+
+    # Check that all cells have been visited
+    for i in range(num_rows):
+        for j in range(num_cols):
+            assert maze._cells[i][j].visited is True
+
+
+def test_break_walls_r_breaks_walls():
+    """Tests that _break_walls_r breaks walls between cells."""
+    num_rows = 2
+    num_cols = 2
+    maze = Maze(0, 0, num_rows, num_cols, 10, 10, seed=1)
+
+    # Check that walls have been broken
+    assert maze._cells[0][0].has_right_wall is True
+    assert maze._cells[0][1].has_left_wall is True
+    assert maze._cells[0][1].has_bottom_wall is False
+    assert maze._cells[1][1].has_top_wall is False
+    assert maze._cells[1][0].has_right_wall is False
+    assert maze._cells[1][1].has_left_wall is False
+    assert maze._cells[0][0].has_bottom_wall is False
+    assert maze._cells[1][0].has_top_wall is False
+
+
+def test_reset_cells_visited():
+    """Tests that _reset_cells_visited resets the visited property of all cells to False."""
+    num_rows = 3
+    num_cols = 4
+    maze = Maze(0, 0, num_rows, num_cols, 10, 10)
+
+    # Set all cells to visited
+    for i in range(num_rows):
+        for j in range(num_cols):
+            maze._cells[i][j].visited = True
+
+    maze._reset_cells_visited()
+
+    # Check that all cells are now unvisited
+    for i in range(num_rows):
+        for j in range(num_cols):
+            assert maze._cells[i][j].visited is False
+
+
+def test_maze_creation_with_seed():
+    """Tests that creating a maze with a seed produces the same maze each time."""
+    num_rows = 3
+    num_cols = 4
+    seed = 42
+    maze1 = Maze(0, 0, num_rows, num_cols, 10, 10, seed=seed)
+    maze2 = Maze(0, 0, num_rows, num_cols, 10, 10, seed=seed)
+
+    # Check that the mazes are the same
+    for i in range(num_rows):
+        for j in range(num_cols):
+            assert maze1._cells[i][j].has_left_wall == maze2._cells[i][j].has_left_wall
+            assert maze1._cells[i][j].has_right_wall == maze2._cells[i][j].has_right_wall
+            assert maze1._cells[i][j].has_top_wall == maze2._cells[i][j].has_top_wall
+            assert maze1._cells[i][j].has_bottom_wall == maze2._cells[i][j].has_bottom_wall

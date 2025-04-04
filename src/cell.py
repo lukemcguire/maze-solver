@@ -18,6 +18,7 @@ class Cell:
         has_right_wall (bool): True if the cell has a right wall, False otherwise.
         has_top_wall (bool): True if the cell has a top wall, False otherwise.
         has_bottom_wall (bool): True if the cell has a bottom wall, False otherwise.
+        visited (bool): True if the cell has been visited. Starts out False for all cells.
         _x1 (float | None): The x-coordinate of the top-left corner of the cell.
         _y1 (float | None): The y-coordinate of the top-left corner of the cell.
         _x2 (float | None): The x-coordinate of the bottom-right corner of the cell.
@@ -39,6 +40,7 @@ class Cell:
         self.has_right_wall = True
         self.has_top_wall = True
         self.has_bottom_wall = True
+        self.visited = False
         self._x1: float | None = None
         self._y1: float | None = None
         self._x2: float | None = None
